@@ -14,6 +14,9 @@ namespace BLAZE_BANK_APP
         public static decimal _deposit = 0;
         public static Customer[] GetCustomers = new Customer[100];
 
+        public CustomerManager()
+        {
+        }
 
         public Customer ChangePin()
         {
@@ -32,25 +35,29 @@ namespace BLAZE_BANK_APP
             Console.WriteLine("Pls input your account number");
             string acctno = Console.ReadLine();
             if (acctno == GenerateAccountNo())
-            Console.WriteLine("Pls input your pin");
-            int pin = int.Parse(Console.ReadLine());
-            Customer customer = new Customer();
-            
-            
-                
-                 if(customer.GetPin() == pin)
-                { 
+            {
+                Console.WriteLine("Pls input your pin");
+                int pin = int.Parse(Console.ReadLine());
+                Customer customer = new Customer();
+
+
+
+
+
+                if (customer.GetPin() == pin)
+                {
                     Console.WriteLine("Enter the amount you want to deposit");
                     decimal amount = decimal.Parse(Console.ReadLine());
-                   
+
                     amount = customer.GetDeposit();
                     Console.WriteLine($"Dear {customer.GetFullName()} you have sucessfully deposited {customer.GetDeposit()} naira");
-                    
+
                 }
-                 else
-            {
-                Console.WriteLine("WRONG PIN!!!!");
             }
+          //  else
+          //  {
+                Console.WriteLine("WRONG PIN!!!!");
+           // }
             return customer;
 
 
@@ -67,9 +74,9 @@ namespace BLAZE_BANK_APP
         
         public  string GenerateAccountNo()
         {
-            String startWith = "32";
+            String startWith = "10";
             Random generator = new Random();
-            String r = generator.Next(0, 99999999).ToString("D6");
+            String r = generator.Next(0, 100000000).ToString("D6");
             String aAccounNumber = startWith + r;
             return aAccounNumber;
 
@@ -186,6 +193,26 @@ namespace BLAZE_BANK_APP
             Console.WriteLine($"Dear {customer.GetFullName()},you have sucessfully registered and your acctNo is {GenerateAccountNo()}");
             
             return customer;
+        }
+
+
+        Transaction ICustomer.ChangePin
+        {
+            get
+            {
+                Customer customer = new Customer();
+                Console.WriteLine($"Dear {customer.GetFullName()} , below are your transactions");
+                Console.WriteLine($"Your current balance is {customer.GetDeposit()} ");
+                Console.WriteLine($"Account number: {customer.GetAcctNo()}");
+                Console.WriteLine($"Pin ****");
+                Customer customer1 = new Customer();
+                return Customer(customer1);
+            }
+        }
+
+        private Transaction Customer(Customer customer1)
+        {
+            throw new NotImplementedException();
         }
     }
 }

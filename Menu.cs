@@ -22,9 +22,12 @@ namespace BLAZE_BANK_APP
                 Console.WriteLine("5.Change Pin");
                 Console.WriteLine("6.Update profile");
                 Console.WriteLine("7. Exit");
+                Console.WriteLine("8. view transaction");
                 Customer customer = new Customer();
                 CustomerManager customerManager = new CustomerManager();
-
+                Transaction transaction = new Transaction();
+                Transaction transaction1 = new Transaction();
+                
                
                 int option = int.Parse(Console.ReadLine());
 
@@ -57,6 +60,10 @@ namespace BLAZE_BANK_APP
                         break;
                     case 7:
                         customerManager.Exit();
+                        ShowMainMenu();
+                        break;
+                    case 8:
+                         customerManager.ChangePin();
                         ShowMainMenu();
                         break;
                     default:

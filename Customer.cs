@@ -12,20 +12,46 @@ namespace BLAZE_BANK_APP
         private string _lastName;
         private int _pin;
         public decimal _deposit;
+        public string _acctNo;
+        private string firstName;
+        private string lastName;
+        private int pin;
+        private decimal deposit;
+
         public Customer()
         {
 
         }
 
-        public Customer(string firstName, string lastName, int pin, decimal deposit)
+        public Customer(string firstName, string lastName, int pin, decimal deposit, string acctNo)
         {
             _firstName = firstName;
             _lastName = lastName;
             _pin = pin;
             _deposit = deposit;
+            _acctNo = acctNo;
         }
 
-        
+        public Customer(string firstName, string lastName, int pin, decimal deposit)
+        {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.pin = pin;
+            this.deposit = deposit;
+        }
+
+        internal object GetAcctNo()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetAcctNo(string acctNo)
+        {
+            return _acctNo;
+        }
+
+
+
 
         public string GetFirstName()
         {
