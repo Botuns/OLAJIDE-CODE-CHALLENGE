@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections;
+
 
 namespace BLAZE_BANK_APP
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             Menu menu = new Menu();
             menu.ShowMainMenu();
-//testing git
         }
     }
 }

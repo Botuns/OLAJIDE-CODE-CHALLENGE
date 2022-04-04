@@ -3,178 +3,211 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace BLAZE_BANK_APP
 {
     class CustomerManager : ICustomer
     {
-        Customer customer = new Customer();
-        public static Customer[] _customers = new Customer[100];
-   
-        public static decimal _deposit = 0;
-        public static Customer[] GetCustomers = new Customer[100];
-
-        public CustomerManager()
+        public static IList<Customer> CustomerList = new List<Customer>();
+        string file = "C:\\Users\\TOSHIBA\\source\\repos\\BLAZE BANK APP\\Files\\Customer.txt";
+       public CustomerManager()
         {
+            ReadCustomerFromFile();
+        }
+        private void ReadCustomerFromFile()
+        {
+            try
+            {
+                if (File.Exists(file))
+                {
+                    var allCustomers = File.ReadAllLines(file);
+                    foreach (var customer in allCustomers)
+                    {
+                        CustomerList.Add(Customer.ToCustomer(customer));
+                    }
+                }
+                else
+                {
+                    string path = "C:\\Users\\TOSHIBA\\source\\repos\\BLAZE BANK APP\\Files";
+                    Directory.CreateDirectory(path);
+                    string fileName = "Customer.txt";
+                    string fullPath = Path.Combine(path, fileName);
+                    using (File.Create(fullPath)) { }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        public void RefreshFile()
+        {
+            try
+            {
+                using (StreamWriter sr = new StreamWriter(file))
+                {
+                    foreach (var customer in CustomerList)
+                    {
+                        sr.WriteLine(customer.ToString());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        private void AddToFile(Customer customer)
+        {
+            try
+            {
+                using (StreamWriter sr = new StreamWriter(file, true))
+                {
+                    sr.WriteLine(customer.ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
-        public Customer ChangePin()
+        public bool Deposit()
         {
-            Console.WriteLine("Enter your old pin");
-            int old = int.Parse(Console.ReadLine());
-            Console.WriteLine("Enter new pin");
-            int neww = int.Parse(Console.ReadLine());
-            Customer customer = new Customer();
-            neww += customer.GetPin();
-            Console.WriteLine("New pin sucessfully updated");
-            return customer;
-        }
-
-        public Customer Deposit()
-        {
+            bool isSuccessful = false;
             Console.WriteLine("Pls input your account number");
             string acctno = Console.ReadLine();
-            if (acctno == GenerateAccountNo())
+            Console.WriteLine("Pls input your pin");
+            int pin = int.Parse(Console.ReadLine());
+            foreach (var item in CustomerList)
             {
-                Console.WriteLine("Pls input your pin");
-                int pin = int.Parse(Console.ReadLine());
-                Customer customer = new Customer();
-
-
-
-
-
-                if (customer.GetPin() == pin)
+                if(item._acctNo ==  acctno && item.GetPin() == pin)
                 {
                     Console.WriteLine("Enter the amount you want to deposit");
                     decimal amount = decimal.Parse(Console.ReadLine());
-
-                    amount = customer.GetDeposit();
-                    Console.WriteLine($"Dear {customer.GetFullName()} you have sucessfully deposited {customer.GetDeposit()} naira");
-
+                    var theCustomer = CustomerList.Where(cust => cust._acctNo == acctno).FirstOrDefault();
+                    var transaction = theCustomer._deposit += amount;
+                    Console.WriteLine($"Dear {theCustomer.GetFullName()} you have sucessfully deposited {amount} naira");
+                    Console.WriteLine("Your new Balance is {0}", theCustomer._deposit);
+                    RefreshFile();
+                    isSuccessful = true;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Credentials");
+                    isSuccessful = false;
                 }
             }
-          //  else
-          //  {
-                Console.WriteLine("WRONG PIN!!!!");
-           // }
-            return customer;
-
-
-
+            return isSuccessful;
         }
 
-        public Customer Exit()
+        public bool Transfer()
         {
-            return customer;
-        }
-
-       
-
-        
-        public  string GenerateAccountNo()
-        {
-            String startWith = "10";
-            Random generator = new Random();
-            String r = generator.Next(0, 100000000).ToString("D6");
-            String aAccounNumber = startWith + r;
-            return aAccounNumber;
-
-
-
-
-        }
-
-        public Customer Transfer()
-        {
-            Console.WriteLine("input your pin");
+            bool isSuccessful = false;
+            Console.WriteLine("Pls input your account number");
+            string acctno = Console.ReadLine();
+            Console.WriteLine("Pls input your pin");
             int pin = int.Parse(Console.ReadLine());
-            Customer customer = new Customer();
-
-
-
-           
-            if (customer.GetPin() == pin)
+            Console.WriteLine("Pls enter the Destination Account Number");
+            string destinationAcct = Console.ReadLine();
+            foreach (var item in CustomerList)
             {
-                Console.WriteLine("Enter the account you want to tranfer");
-                decimal trans = decimal.Parse(Console.ReadLine());
-                Console.WriteLine("Enter the amount");
-                decimal amount = decimal.Parse (Console.ReadLine());
-                if (amount > customer.GetDeposit())
+                if (item._acctNo == acctno && item.GetPin() == pin)
                 {
-                    Console.WriteLine("insufficient fund");
-                    if (amount < customer.GetDeposit())
-                    {
-                        Console.WriteLine("You will transfer with a deduction of 2%");
+                    Console.WriteLine("Enter the amount you want to Transfer");
+                    decimal amount = decimal.Parse(Console.ReadLine());
+                    var theCustomer = CustomerList.Where(cust => cust._acctNo == acctno).FirstOrDefault();
 
-                        
-                        Console.WriteLine($" Sucesssful transfer by {customer.GetFullName()}");
-                        Console.WriteLine($"your current balance is {(customer.GetDeposit()- amount)} naira ");
+                    if (amount > theCustomer.GetDeposit())
+                    {
+                        Console.WriteLine("You cant transfer, insuficient balance ");
+                        isSuccessful = false;
+                    }
+                    else if (amount < theCustomer.GetDeposit())
+                    {
+                        var transaction = theCustomer._deposit -= amount;
+                        Console.WriteLine($" Dear {theCustomer.GetFullName()}  Transfer sucessful!,  Your new Balance is{theCustomer.GetDeposit()}");
+                        RefreshFile();
+                        isSuccessful = true;
                     }
                 }
-              else  if (customer.GetPin() != pin)
+                else
                 {
-                    Console.WriteLine("invalid pin");
+                    Console.WriteLine("Invalid Credentials");
+                    isSuccessful = false;
                 }
-
             }
-            return customer;
-
+            return isSuccessful;
         }
 
-        public Customer UpdateProfile()
+        public void UpdateProfile()
         {
-            Console.WriteLine("1.Upate First name");
-            Console.WriteLine("2. update Last Name");
-            Console.WriteLine(" choose an option to update");
-            int option = int.Parse(Console.ReadLine());
-            switch (option)
+            Console.WriteLine("Pls input your account number");
+            string acctno = Console.ReadLine();
+            Console.WriteLine("Pls input your pin");
+            int pin = int.Parse(Console.ReadLine());
+            foreach (var item in CustomerList)
             {
-                case 1:
+                if (item._acctNo == acctno && item.GetPin() == pin)
+                {
+                    var theCustomer = CustomerList.Where(cust => cust._acctNo == acctno).FirstOrDefault();
+
                     Console.WriteLine("Enter new firstName");
                     string nmae = Console.ReadLine();
-                    Customer customer = new Customer();
-                    nmae = customer.GetFirstName();
-                    Console.WriteLine("Sucessfully Updated");
-                    break;
-                case 2:
                     Console.WriteLine("Enter new lastName");
                     string last = Console.ReadLine();
-                    customer = new Customer();
-                    last = customer.GetLastName();
-                    Console.WriteLine("Sucessfully Updated");
-                    break;
-                    default:
-                    break;
+                    Console.WriteLine("Enter new Pin");
+                    int newPin = int.Parse(Console.ReadLine());
+                    theCustomer.SetFirstName(nmae);
+                    theCustomer.SetLastName(last);
+                    theCustomer.Setpin(newPin);
+                    RefreshFile();
+                    Console.WriteLine("Details Successfully Updated");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Credentials");
+                }
+                RefreshFile();
             }
-            return customer;
         }
 
-        public Customer WithDraw()
+        public bool WithDraw()
         {
-            Console.WriteLine("Pls enter your pin");
-                int pin = int.Parse(Console.ReadLine());
-            Customer customer = new Customer();
-            if(customer.GetPin() != pin)
+            bool isSuccessful = false;
+            Console.WriteLine("Pls input your account number");
+            string acctno = Console.ReadLine();
+            Console.WriteLine("Pls input your pin");
+            int pin = int.Parse(Console.ReadLine());
+            foreach (var item in CustomerList)
             {
-                Console.WriteLine("WRONG PIN!!!!");
-            }
-            else
-            {
-                Console.WriteLine("Enter the amount you want to deposit");
-                decimal amount = decimal.Parse(Console.ReadLine());
-                if(amount > customer.GetDeposit())
+                if (item._acctNo == acctno && item.GetPin() == pin)
                 {
-                    Console.WriteLine("You cant withdraw, insuficient balance ");
 
+                    Console.WriteLine("Enter the amount you want to withdraw");
+                    decimal amount = decimal.Parse(Console.ReadLine());
+                    var theCustomer = CustomerList.Where(cust => cust._acctNo == acctno).FirstOrDefault();
+
+                    if (amount > theCustomer.GetDeposit())
+                    {
+                        Console.WriteLine("You cant withdraw, insuficient balance ");
+                        isSuccessful = false;
+                    }
+                    else if (amount < theCustomer.GetDeposit())
+                    {
+                        var transaction = theCustomer._deposit -= amount;
+                        Console.WriteLine($" Dear {theCustomer.GetFullName()}  Withdraw sucessful!,  Your new Balance is {theCustomer.GetDeposit()}");
+                        isSuccessful = true;
+                    }
                 }
-                else if(amount < customer.GetDeposit())
+                else
                 {
-                    Console.WriteLine($" Dear {customer.GetFullName()}  Withdraw sucessful!,  acctBalance is{customer.GetDeposit()-amount} ");
-
+                    Console.WriteLine("Invalid Credentials");
+                    isSuccessful = false;
                 }
             }
-            return customer;
+            return isSuccessful;
         } 
 
         public  Customer Register()
@@ -186,33 +219,12 @@ namespace BLAZE_BANK_APP
             Console.WriteLine("Enter Pin");
             int pin = int.Parse(Console.ReadLine());
 
-
-            Customer customer = new Customer(firstName, lastName, pin, _deposit);
-            GetCustomers[(int)_deposit] = customer;
-            _deposit++;
-            Console.WriteLine($"Dear {customer.GetFullName()},you have sucessfully registered and your acctNo is {GenerateAccountNo()}");
+            Customer customer = new Customer(firstName, lastName, pin);
+            AddToFile(customer);
+            CustomerList.Add(customer);
+            Console.WriteLine($"Dear {customer.GetFullName()},you have sucessfully registered and your acctNo is {customer.GetAcctNo()}");
             
             return customer;
-        }
-
-
-        Transaction ICustomer.ChangePin
-        {
-            get
-            {
-                Customer customer = new Customer();
-                Console.WriteLine($"Dear {customer.GetFullName()} , below are your transactions");
-                Console.WriteLine($"Your current balance is {customer.GetDeposit()} ");
-                Console.WriteLine($"Account number: {customer.GetAcctNo()}");
-                Console.WriteLine($"Pin ****");
-                Customer customer1 = new Customer();
-                return Customer(customer1);
-            }
-        }
-
-        private Transaction Customer(Customer customer1)
-        {
-            throw new NotImplementedException();
         }
     }
 }

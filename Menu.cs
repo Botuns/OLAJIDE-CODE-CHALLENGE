@@ -8,25 +8,24 @@ namespace BLAZE_BANK_APP
 {
     public class Menu
     {
-        CustomerManager cust = new CustomerManager();
         public void ShowMainMenu()
         {
             bool continueApp = true;
 
             do
             {
+                Console.WriteLine("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+                Console.WriteLine("_-_-_-_-WELCOME TO BLAZE BANK_-_-_-_-_-_-_-_");
+                Console.WriteLine("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+
+
                 Console.WriteLine("1. Register");
                 Console.WriteLine("2. Deposit");
                 Console.WriteLine("3 WithDraw");
                 Console.WriteLine("4. Transfer");
-                Console.WriteLine("5.Change Pin");
-                Console.WriteLine("6.Update profile");
-                Console.WriteLine("7. Exit");
-                Console.WriteLine("8. view transaction");
-                Customer customer = new Customer();
+                Console.WriteLine("5.Update profile");
+                Console.WriteLine("6. Exit");
                 CustomerManager customerManager = new CustomerManager();
-                Transaction transaction = new Transaction();
-                Transaction transaction1 = new Transaction();
                 
                
                 int option = int.Parse(Console.ReadLine());
@@ -35,7 +34,6 @@ namespace BLAZE_BANK_APP
                 {
                     case 1:
                         customerManager.Register();
-                      
                         ShowMainMenu();
                         break;
                     case 2:
@@ -51,30 +49,15 @@ namespace BLAZE_BANK_APP
                         ShowMainMenu();
                         break;
                     case 5:
-                        customerManager.ChangePin();
-                        ShowMainMenu();
-                        break;
-                    case 6:
                         customerManager.UpdateProfile();
                         ShowMainMenu();
                         break;
-                    case 7:
-                        customerManager.Exit();
-                        ShowMainMenu();
-                        break;
-                    case 8:
-                         customerManager.ChangePin();
-                        ShowMainMenu();
-                        break;
+                    case 6:
+                        return;
                     default:
                         break;
-
-
-
-
                 }
             } while (continueApp);
-
         }
     }
 }

@@ -13,17 +13,21 @@ namespace BLAZE_BANK_APP
         private int _pin;
         public decimal _deposit;
         public string _acctNo;
-        private string firstName;
-        private string lastName;
-        private int pin;
-        private decimal deposit;
 
         public Customer()
         {
 
         }
 
-        public Customer(string firstName, string lastName, int pin, decimal deposit, string acctNo)
+        public  Customer(string firstName, string lastName, int pin)
+        {
+            _firstName = firstName;
+            _lastName = lastName;
+            _pin = pin;
+            _deposit = 0;
+            _acctNo = GenerateAccountNo();
+        }
+        public  Customer(string firstName, string lastName, int pin, decimal deposit, string acctNo)
         {
             _firstName = firstName;
             _lastName = lastName;
@@ -31,28 +35,33 @@ namespace BLAZE_BANK_APP
             _deposit = deposit;
             _acctNo = acctNo;
         }
-
-        public Customer(string firstName, string lastName, int pin, decimal deposit)
+        public static string GenerateAccountNo()
         {
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.pin = pin;
-            this.deposit = deposit;
+            String startWith = "10";
+            Random generator = new Random();
+            String r = generator.Next(0, 100000000).ToString("D6");
+            String aAccounNumber = startWith + r;
+            return aAccounNumber;
         }
-
-        internal object GetAcctNo()
+        public override string ToString()
         {
-            throw new NotImplementedException();
+            return $"\t{_firstName}\t{_lastName}\t{_pin}\t{_deposit}\t{_acctNo}";
         }
-
-        public string GetAcctNo(string acctNo)
+        public static Customer ToCustomer (string str)
+        {
+            var customerStr = str.Split("\t");
+            string firstName = customerStr[0];
+            string lastName = customerStr[1];
+            int pin = Convert.ToInt32(customerStr[2]);
+            decimal deposit = Convert.ToDecimal(customerStr[3]);
+            string acctNo = customerStr[4];
+            Customer customer = new Customer(firstName, lastName, pin,deposit,acctNo);
+            return customer;
+        }
+        public string GetAcctNo()
         {
             return _acctNo;
         }
-
-
-
-
         public string GetFirstName()
         {
             return _firstName;
@@ -86,10 +95,5 @@ namespace BLAZE_BANK_APP
         {
             return _pin;
         }
-        public void Register()
-        {
-            return;
-        }
-
     }
 }

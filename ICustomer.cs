@@ -9,13 +9,9 @@ namespace BLAZE_BANK_APP
     interface ICustomer
     {
         public Customer Register();
-        public Transaction ChangePin { get; }
-
-        public Customer Deposit();
-        public Customer WithDraw();
-        public Customer Transfer();
-        public Customer ChangePin();
-        public Customer UpdateProfile();
-        public Customer Exit();
+        public bool Deposit();
+        public bool WithDraw();
+        public bool Transfer();
+        public void UpdateProfile();
     }
 }
